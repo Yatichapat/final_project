@@ -1,30 +1,75 @@
 # import database module
+import random
+import string
+from database import DB, Table
 
-# define a funcion called initializing
+
+# define a function called initializing
 
 def initializing():
-    pass
+    # here are things to do in this function:
 
-# here are things to do in this function:
+    # create an object to read an input csv file, persons.csv
+    person_db = DB()
+    person = person_db.read_csv('persons.csv')
 
-    # create an object to read all csv files that will serve as a persistent state for this program
+    # create a 'persons' table
+    table_person = Table('person', person)
 
-    # create all the corresponding tables for those csv files
+    # add the 'persons' table into the database
+    person_db.insert(table_person)
+    my_table_person = person_db.search('person')
 
-    # see the guide how many tables are needed
+    # create a 'login' table
+    table_login = Table('login', [])
 
-    # add all these tables to the database
+    # the 'login' table has the following keys (attributes):
+    # person_id
+    # username
+    # password
+    # role
+
+    # a person_id is the same as that in the 'persons' table
+    if my_table_person:
+        for person in table_person.table:
+            person_id = person['ID']
+
+            # let a username be a person's first name followed by a dot and the first letter of that person's last name
+            username = f"{person['first']}.{person['last'][0]}"
+
+            # let a password be a random four digits string
+            password = ''.join(random.choices(string.digits, k=4))
+
+            # let the initial role of all the students be Member
+            # let the initial role of all the faculties be Faculty
+            role = 'Member' if person['type'] == 'student' else 'Faculty'
+
+            # create a login table by performing a series of insert operations; each insert adds a dictionary to a list
+            login_entry = {
+                'ID': person_id,
+                'username': username,
+                'password': password,
+                'role': role
+            }
+            table_login.insert(login_entry)
+
+    # add the 'login' table into the database
+    person_db.insert(table_login)
+    print(table_login)
+    return table_login
 
 
-# define a funcion called login
+# define a function called login
 
-def login():
-    pass
+def login(table_login):
+    username = input('Enter username: ')
+    password = input('Enter password: ')
 
-# here are things to do in this function:
-   # add code that performs a login task
-        # ask a user for a username and password
-        # returns [ID, role] if valid, otherwise returning None
+    for entry in table_login.table:
+        if entry['username'] == username and entry['password'] == password:
+            return [entry['ID'], entry['role']]
+    return None
+
 
 # define a function called exit
 def exit():
@@ -39,8 +84,10 @@ def exit():
 
 # make calls to the initializing and login functions defined above
 
-initializing()
-val = login()
+login_table = initializing()
+val = login(login_table)
+print(val)
+
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
 
