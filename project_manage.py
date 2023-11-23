@@ -1,4 +1,5 @@
 # import database module
+import csv
 import random
 import string
 from database import DB, Table
@@ -73,7 +74,12 @@ def login(table_login):
 
 # define a function called exit
 def exit():
-    pass
+    with open('persons.csv', 'w') as new_person_file:
+        fieldnames = ['ID', 'username', 'password', 'role']
+        writer = csv.DictWriter(new_person_file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(login_table.table)
+
 
 # here are things to do in this function:
    # write out all the tables that have been modified to the corresponding csv files
@@ -104,5 +110,6 @@ print(val)
 # elif val[1] = 'advisor':
     # see and do advisor related activities
 
-# once everyhthing is done, make a call to the exit function
-exit()
+
+# once everything is done, make a call to the exit function
+# exit()
