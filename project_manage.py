@@ -1,9 +1,6 @@
 # import database module
 import csv
-import random
-import string
 from database import DB, Table
-
 
 # define a function called initializing
 
@@ -11,74 +8,40 @@ def initializing():
     # here are things to do in this function:
 
     # create an object to read an input csv file, persons.csv
-    person_db = DB()
-    person = person_db.read_csv('persons.csv')
+    person = my_db.read_csv('persons.csv')
+    login = my_db.read_csv('login.csv')
 
     # create a 'persons' table
     table_person = Table('person', person)
+    table_login = Table('login', login)
 
     # add the 'persons' table into the database
-    person_db.insert(table_person)
-    my_table_person = person_db.search('person')
-
-    # create a 'login' table
-    table_login = Table('login', [])
-
-    # the 'login' table has the following keys (attributes):
-    # person_id
-    # username
-    # password
-    # role
-
-    # a person_id is the same as that in the 'persons' table
-    if my_table_person:
-        for person in table_person.table:
-            person_id = person['ID']
-
-            # let a username be a person's first name followed by a dot and the first letter of that person's last name
-            username = f"{person['first']}.{person['last'][0]}"
-
-            # let a password be a random four digits string
-            password = ''.join(random.choices(string.digits, k=4))
-
-            # let the initial role of all the students be Member
-            # let the initial role of all the faculties be Faculty
-            role = 'Member' if person['type'] == 'student' else 'Faculty'
-
-            # create a login table by performing a series of insert operations; each insert adds a dictionary to a list
-            login_entry = {
-                'ID': person_id,
-                'username': username,
-                'password': password,
-                'role': role
-            }
-            table_login.insert(login_entry)
-
-    # add the 'login' table into the database
-    person_db.insert(table_login)
-    print(table_login)
-    return table_login
-
-
+    my_db.insert(table_person)
+    my_db.insert(table_login)
 # define a function called login
 
-def login(table_login):
+
+def login():
     username = input('Enter username: ')
     password = input('Enter password: ')
+    my_login = my_db.search('login')
 
-    for entry in table_login.table:
+    for entry in my_login.table:
         if entry['username'] == username and entry['password'] == password:
             return [entry['ID'], entry['role']]
     return None
 
 
 # define a function called exit
-def exit():
-    with open('persons.csv', 'w') as new_person_file:
-        fieldnames = ['ID', 'username', 'password', 'role']
-        writer = csv.DictWriter(new_person_file, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(login_table.table)
+
+def exit(filename, table, head,):
+    with open(filename, 'w'):
+        writer = csv.writer(filename)
+        writer.writerow(head)
+        for dictionary in my_db.search(table).table:
+            writer.writerow(dictionary.values())
+        filename.close()
+
 
 
 # here are things to do in this function:
@@ -89,9 +52,9 @@ def exit():
 
 
 # make calls to the initializing and login functions defined above
-
-login_table = initializing()
-val = login(login_table)
+my_db = DB()
+initializing()
+val = login()
 print(val)
 
 
