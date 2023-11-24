@@ -17,6 +17,12 @@ class DB:
                 csv_data.append(dict(r))
         return csv_data
 
+    def write_csv(self, filename_csv, table, head, db):
+        with open(filename_csv, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(head)
+            for dic in db.search(table).table:
+                writer.writerow(dic.values())
 
 
     def insert(self, table):

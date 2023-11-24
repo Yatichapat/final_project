@@ -10,14 +10,21 @@ def initializing():
     # create an object to read an input csv file, persons.csv
     person = my_db.read_csv('persons.csv')
     login = my_db.read_csv('login.csv')
+    advisor_pending = my_db.read_csv('Advisor_pending_request.csv')
+    member_pending = my_db.read_csv('Member_pending_request.csv')
 
     # create a 'persons' table
     table_person = Table('person', person)
     table_login = Table('login', login)
+    table_advisor = Table('advisor_pending', advisor_pending)
+    table_member = Table('member_pending', member_pending)
 
     # add the 'persons' table into the database
     my_db.insert(table_person)
     my_db.insert(table_login)
+    my_db.insert(table_advisor)
+    my_db.insert(table_member)
+    print(table_login)
 # define a function called login
 
 
@@ -34,13 +41,8 @@ def login():
 
 # define a function called exit
 
-def exit(filename, table, head,):
-    with open(filename, 'w'):
-        writer = csv.writer(filename)
-        writer.writerow(head)
-        for dictionary in my_db.search(table).table:
-            writer.writerow(dictionary.values())
-        filename.close()
+def exit():
+    my_db.write_csv('Advisor_pending_request.csv', 'advisor_pending', ['Name', 'ID', 'role', 'password'], my_db)
 
 
 
@@ -75,4 +77,4 @@ print(val)
 
 
 # once everything is done, make a call to the exit function
-# exit()
+exit()
