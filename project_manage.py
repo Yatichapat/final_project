@@ -31,7 +31,6 @@ def initializing():
 def login():
     username = input('Enter username: ')
     password = input('Enter password: ')
-    my_login = my_db.search('login')
 
     for entry in my_login.table:
         if entry['username'] == username and entry['password'] == password:
@@ -42,7 +41,7 @@ def login():
 # define a function called exit
 
 def exit():
-    my_db.write_csv('Advisor_pending_request.csv', 'advisor_pending', ['Name', 'ID', 'role', 'password'], my_db)
+    my_db.write_csv('Advisor_pending_request.csv', 'advisor_pending', ['ID', 'Username', 'Information'], my_db)
 
 
 
@@ -56,8 +55,8 @@ def exit():
 # make calls to the initializing and login functions defined above
 my_db = DB()
 initializing()
-val = login()
-print(val)
+# val = login()
+# print(val)
 
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id

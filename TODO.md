@@ -47,3 +47,6 @@
     - Approve the project
     - Deny the project
 - Log Out
+
+### For Admin
+- Access Database
