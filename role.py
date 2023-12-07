@@ -1,5 +1,5 @@
 from database import DB, Table, gen_project_id
-from datetime import datetime
+from datetime import date
 database = DB()
 
 class Student:
@@ -16,10 +16,11 @@ class Student:
 
     def respond_request(self, project_id, respond):
         member_pending = self.__db.search('Member_pending_request')
-        member_pending_row = member_pending.get_row(lambda x: x['ProjectID'] == project_id and x['ID'] == self.__id)
         project = self.__db.search('project')
-        project_row = project.get_row(lambda x: x['ProjectID'] == project_id)
         login = self.__db.search('login')
+
+        member_pending_row = member_pending.get_row(lambda x: x['ProjectID'] == project_id and x['ID'] == self.__id)
+        project_row = project.get_row(lambda x: x['ProjectID'] == project_id)
         login_row = login.get_row(lambda x: x['ID'] == self.__id)
         member_pending.update(member_pending_row, 'Response_date', date.today())
         while True:
@@ -54,4 +55,3 @@ class Student:
         login_row = login.get_row(lambda x: x['ID'] == self.__id)
         login.update(login_row, 'role', 'lead')
 
-    def
