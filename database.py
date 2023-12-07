@@ -1,6 +1,8 @@
 import csv, os
 import random
 from datetime import datetime
+import copy
+
 
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -35,6 +37,7 @@ def get_info(db, id_person):
         else:
             continue
 
+
 def gen_project_id():
     year = datetime.now().year % 100
     class_generation = random.randint(10,99)
@@ -42,9 +45,9 @@ def gen_project_id():
     project_id = f'{year:02d}{class_generation:02d}{order_number:02d}'
     return project_id
 
-
-
 # add in code for a Database class
+
+
 class DB:
     def __init__(self):
         self.database = []
@@ -58,9 +61,15 @@ class DB:
                 return table
         return None
 
+    def remove(self, table_name):
+        for _ in self.database:
+            if _.table_name == table_name:
+                self.database.remove(_)
+                break
+
+
 
 # add in code for a Table class
-import copy
 
 
 class Table:
@@ -124,8 +133,6 @@ class Table:
         if row in self.table:
             if key in self.table[row]:
                 self.table[row][key] = val
-
-
 
     def __str__(self):
         return self.table_name + ':' + str(self.table)

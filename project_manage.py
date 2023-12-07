@@ -1,9 +1,10 @@
 # import database module
 import csv
 from database import DB, Table, read_csv, write_csv
-from role import Student
+from role import Student, Admin
 
 # define a function called initializing
+
 
 def initializing():
     # here are things to do in this function:
@@ -29,7 +30,6 @@ def initializing():
     my_db.insert(table_member_pend)
     my_db.insert(table_project)
     print(table_login)
-# define a function called login
 
 
 def login():
