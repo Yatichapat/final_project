@@ -1,29 +1,53 @@
-# try wrapping the code below that reads a persons.csv file in a class and make it more general such that it can read in any csv file
 import csv, os
+import random
+from datetime import datetime
+
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+
+def read_csv(csv_file):
+    csv_data = []
+    with open(os.path.join(__location__, csv_file)) as f:
+        rows = csv.DictReader(f)
+        for r in rows:
+            csv_data.append(dict(r))
+    return csv_data
+
+
+def write_csv(filename, head, db):
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(head)
+        for dic in db.search(filename).table:
+            writer.writerow(dic.values())
+        csvfile.close()
+
+
+def get_info(db, id_person):
+    person_info = db.search('person')
+    login_data = db.search('login')
+    id_data = db.search('ID')
+    temp = person_info.join(login_data, id_data)
+    for i in temp.table:
+        if i['ID'] == id_person:
+            return {'ID': i['ID'], 'first': i['first'], 'last': i['last'], 'role': i['role']}
+        else:
+            continue
+
+def gen_project_id():
+    year = datetime.now().year % 100
+    class_generation = random.randint(10,99)
+    order_number = random.randint(10, 99)
+    project_id = f'{year:02d}{class_generation:02d}{order_number:02d}'
+    return project_id
+
+
 
 # add in code for a Database class
 class DB:
     def __init__(self):
         self.database = []
-
-    def read_csv(self, csv_file):
-        __location__ = os.path.realpath(
-            os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-        csv_data = []
-        with open(os.path.join(__location__, csv_file)) as f:
-            rows = csv.DictReader(f)
-            for r in rows:
-                csv_data.append(dict(r))
-        return csv_data
-
-    def write_csv(self, filename_csv, table, head, db):
-        with open(filename_csv, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(head)
-            for dic in db.search(table).table:
-                writer.writerow(dic.values())
-
 
     def insert(self, table):
         self.database.append(table)
@@ -34,8 +58,11 @@ class DB:
                 return table
         return None
 
+
 # add in code for a Table class
 import copy
+
+
 class Table:
     def __init__(self, table_name, table):
         self.table_name = table_name
@@ -77,6 +104,28 @@ class Table:
 
     def insert(self, table):
         self.table.append(table)
+
+    def get_row(self, condition):
+        row = 0
+        for i in self.table:
+            if condition(i):
+                return row
+            else:
+                row += 1
+
+    def head(self, csv_file):
+        with open(os.path.join(__location__, csv_file)) as f:
+            row_write = csv.reader(f)
+            for i in row_write:
+                head = i
+            return head[0]
+
+    def update(self, row, key, val):
+        if row in self.table:
+            if key in self.table[row]:
+                self.table[row][key] = val
+
+
 
     def __str__(self):
         return self.table_name + ':' + str(self.table)

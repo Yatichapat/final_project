@@ -1,6 +1,7 @@
 # import database module
 import csv
-from database import DB, Table
+from database import DB, Table, read_csv, write_csv
+from role import Student
 
 # define a function called initializing
 
@@ -8,22 +9,25 @@ def initializing():
     # here are things to do in this function:
 
     # create an object to read an input csv file, persons.csv
-    person = my_db.read_csv('persons.csv')
-    login = my_db.read_csv('login.csv')
-    advisor_pending = my_db.read_csv('Advisor_pending_request.csv')
-    member_pending = my_db.read_csv('Member_pending_request.csv')
+    person = read_csv('persons.csv')
+    login = read_csv('login.csv')
+    advisor_pending = read_csv('Advisor_pending_request.csv')
+    member_pending = read_csv('Member_pending_request.csv')
+    project = read_csv('project.csv')
 
     # create a 'persons' table
     table_person = Table('person', person)
     table_login = Table('login', login)
-    table_advisor = Table('advisor_pending', advisor_pending)
-    table_member = Table('member_pending', member_pending)
+    table_advisor_pend = Table('advisor_pending', advisor_pending)
+    table_member_pend = Table('member_pending', member_pending)
+    table_project = Table('project.csv', project)
 
     # add the 'persons' table into the database
     my_db.insert(table_person)
     my_db.insert(table_login)
-    my_db.insert(table_advisor)
-    my_db.insert(table_member)
+    my_db.insert(table_advisor_pend)
+    my_db.insert(table_member_pend)
+    my_db.insert(table_project)
     print(table_login)
 # define a function called login
 
@@ -31,6 +35,7 @@ def initializing():
 def login():
     username = input('Enter username: ')
     password = input('Enter password: ')
+    my_login = my_db.search('login')
 
     for entry in my_login.table:
         if entry['username'] == username and entry['password'] == password:
@@ -41,7 +46,7 @@ def login():
 # define a function called exit
 
 def exit():
-    my_db.write_csv('Advisor_pending_request.csv', 'advisor_pending', ['ID', 'Username', 'Information'], my_db)
+    write_csv('project.csv', 'projects', my_db)
 
 
 
@@ -55,8 +60,10 @@ def exit():
 # make calls to the initializing and login functions defined above
 my_db = DB()
 initializing()
-# val = login()
-# print(val)
+val = login()
+
+
+
 
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id

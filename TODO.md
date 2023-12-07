@@ -5,6 +5,9 @@
   - Create project
   - Send the invitation to student (accepted or deny choice) or can choose to do by their own (not send invitation)
   - (include two other members) Choose faculty to be their advisor
+- Member
+  - Modify project
+  - (include leader) Choose faculty to be their advisor
 - Faculty
   - those faculty type that is not yet has a role or be any advisor of senior project
 - Advisor
@@ -16,7 +19,7 @@
 - Create project
   - This will turn the student role into leader of the group and will have the choice for them whether to look for their member or solo.
   - However, this choice will complete after deny all invitation from others
-- Email
+- Notification
   - Contain their request if the leader sent invitation to them. If it has the invitation letter they can decide to accept or not
 - Log out
 
@@ -35,14 +38,15 @@
 
 
 ### For faculty login will have these choices
-- Email (Show notification)
+- Notification
   - Be Adviser
     - if they accept, the faculty will turn to be adviser.
+    - if they denied, the request will be deleted and show the denied request to student.
   - Log Out
 - Log out
 
 ### For faculty who turn to be adviser will see these choices
-- Email (Show notification)
+- Notification
   - Evaluate project (see the proposal)
     - Approve the project
     - Deny the project
@@ -50,3 +54,4 @@
 
 ### For Admin
 - Access Database
+- Modify user system
