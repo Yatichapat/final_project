@@ -19,11 +19,10 @@ class Student:
                 f'Last name: {self.__last}\n'
                 f'ID: {self.__id}')
 
-
-    def see_request_pending(self):
+    def see_request_member(self):
         print(self.__db.search('Member_pending_request').table)
 
-    def respond_request(self, project_id, respond):
+    def respond_member_request(self, project_id, respond):
         member_pending = self.__db.search('Member_pending_request')
         project = self.__db.search('project')
         login = self.__db.search('login')
@@ -66,33 +65,3 @@ class Student:
         login = self.__db.search('login')
         login_row = login.get_row(lambda x: x['ID'] == self.__id)
         login.update(login_row, 'role', 'lead')
-
-
-class Admin:
-    def __init__(self, data_dict, db):
-        self.__id = data_dict['ID']
-        self.__user = data_dict['user']
-        self.__first = data_dict['first']
-        self.__last = data_dict['last']
-        self.__role = data_dict['role']
-        self.__db = db
-
-    def __str__(self):
-        return (f'Hello {self.__user}. You activate as a {self.__role}\n'
-                f'This is the user information\n'
-                f'First name: {self.__first}\n'
-                f'Last name: {self.__last}\n'
-                f'ID: {self.__id}')
-
-    def view_database(self):
-        return self.__db
-
-    def create_table(self, table_name):
-        self.__db.insert(Table(table_name, []))
-
-    def delete_table(self, table_name):
-        self.__db.remove(table_name)
-
-
-
-

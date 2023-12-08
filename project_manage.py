@@ -1,7 +1,6 @@
 # import database module
-import csv
 from database import DB, Table, read_csv, write_csv
-from role import Student, Admin
+
 
 # define a function called initializing
 
@@ -12,7 +11,7 @@ def initializing():
     # create an object to read an input csv file, persons.csv
     person = read_csv('persons.csv')
     login = read_csv('login.csv')
-    advisor_pending = read_csv('Advisor_pending_request.csv')
+    advisor_pending = read_csv('Advisor_pending_request.csv.csv')
     member_pending = read_csv('Member_pending_request.csv')
     project = read_csv('project.csv')
 

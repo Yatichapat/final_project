@@ -53,5 +53,8 @@
 - Log Out
 
 ### For Admin
-- Access Database
+- Access Database (can see database)
 - Modify user system
+  - create new table and row
+- Security Support Ex. when user doesn't remember their password
+- delete table and row
