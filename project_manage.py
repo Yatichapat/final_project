@@ -1,5 +1,6 @@
 # import database module
-from database import DB, Table, read_csv, write_csv
+from database import DB, Table, read_csv, write_csv, get_info
+from role.Admin import Admin
 
 
 # define a function called initializing
@@ -11,7 +12,7 @@ def initializing():
     # create an object to read an input csv file, persons.csv
     person = read_csv('persons.csv')
     login = read_csv('login.csv')
-    advisor_pending = read_csv('Advisor_pending_request.csv.csv')
+    advisor_pending = read_csv('Advisor_pending_request.csv')
     member_pending = read_csv('Member_pending_request.csv')
     project = read_csv('project.csv')
 
@@ -20,7 +21,7 @@ def initializing():
     table_login = Table('login', login)
     table_advisor_pend = Table('advisor_pending', advisor_pending)
     table_member_pend = Table('member_pending', member_pending)
-    table_project = Table('project.csv', project)
+    table_project = Table('project', project)
 
     # add the 'persons' table into the database
     my_db.insert(table_person)
@@ -42,6 +43,41 @@ def login():
     return None
 
 
+def reset_password():
+    username = 'Cristiano.R'
+    user_id = '7447677'
+    info_person = get_info(my_db, user_id)
+    login_table = my_db.search('login')
+    login_row = login_table.get_row['']
+
+    if info_person and info_person['username'] == username and info_person['ID'] == user_id:
+        while True:
+            yes_no = input('You want to reset the password? (y/n): ')
+            if yes_no.lower() in ['y', 'yes']:
+                select = input('Enter your new password (4 digits): ')
+                confirm = input('Confirm password: ')
+                if select == confirm:
+                    for entry in login_table.table:
+                        if entry['ID'] == user_id and entry['username'] == username:
+                            entry['password'] = confirm
+                    break
+                else:
+                    print('Your password is not the same. Please enter password again.')
+
+            elif yes_no.lower() in ['n', 'no']:
+                break
+
+            else:
+                print('Your answer is none of the above')
+
+    else:
+        print(f'Username {username} with ID {user_id} cannot be found.')
+
+
+
+
+
+
 # define a function called exit
 
 def exit():
@@ -59,7 +95,8 @@ def exit():
 # make calls to the initializing and login functions defined above
 my_db = DB()
 initializing()
-val = login()
+# val = login()
+reset_password()
 
 
 
@@ -82,4 +119,4 @@ val = login()
 
 
 # once everything is done, make a call to the exit function
-exit()
+# exit()

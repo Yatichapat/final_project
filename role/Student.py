@@ -20,10 +20,10 @@ class Student:
                 f'ID: {self.__id}')
 
     def see_request_member(self):
-        print(self.__db.search('Member_pending_request').table)
+        print(self.__db.search('member_pending').table)
 
     def respond_member_request(self, project_id, respond):
-        member_pending = self.__db.search('Member_pending_request')
+        member_pending = self.__db.search('member_pending')
         project = self.__db.search('project')
         login = self.__db.search('login')
 

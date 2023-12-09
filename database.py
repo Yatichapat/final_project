@@ -29,13 +29,13 @@ def write_csv(filename, head, db):
 def get_info(db, id_person):
     person_info = db.search('person')
     login_data = db.search('login')
-    id_data = db.search('ID')
-    temp = person_info.join(login_data, id_data)
+    temp = person_info.join(login_data, 'ID')
+
+    print(temp)
+
     for i in temp.table:
         if i['ID'] == id_person:
-            return {'ID': i['ID'], 'first': i['first'], 'last': i['last'], 'role': i['role']}
-        else:
-            continue
+            return {'ID': i['ID'], 'username': i['username'], 'first': i['first'], 'last': i['last'], 'role': i['role']}
 
 
 def gen_project_id():
