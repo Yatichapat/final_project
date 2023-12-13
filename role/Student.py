@@ -6,7 +6,7 @@ database = DB()
 class Student:
     def __init__(self, data_dict, db):
         self.__id = data_dict['ID']
-        self.__user = data_dict['user']
+        self.__user = data_dict['username']
         self.__first = data_dict['first']
         self.__last = data_dict['last']
         self.__role = data_dict['role']
@@ -73,8 +73,8 @@ class Lead(Student):
     def auto_resend_request(self, request):
         member_pending = self.__db.search('member_pending')
 
-        request['Response date'] = datetime.now().date()
-        request['Resend counter'] = request.get('Resend counter', 0) + 1
+        request['Response_date'] = datetime.now().date()
+        request['Resend_counter'] = request.get('Resend_counter', 0) + 1
 
         self.__db.update(member_pending, 'Resend counter', request)
 

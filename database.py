@@ -137,6 +137,8 @@ class Table:
             if key in self.table[row] and self.table[row][key] == val:
                 del self.table[row]
 
+
+
     def __str__(self):
         return self.table_name + ':' + str(self.table)
 

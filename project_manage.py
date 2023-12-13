@@ -1,5 +1,6 @@
 # import database module
 from database import DB, Table, read_csv, write_csv, get_info
+from role.Student import Student, Lead, Member
 from role.Admin import Admin
 
 # define a function called initializing
@@ -31,9 +32,9 @@ def initializing():
 
     person_join_login = table_person.join(table_login, 'ID')
 
-    for person_info in person_join_login.table:
-        admin = Admin(person_info, my_db)
-        admin.view_all_project()
+    # for person_info in person_join_login.table:
+    #     admin = Admin(person_info, my_db)
+    #     admin.view_all_project()
 
 
 def login():
@@ -47,40 +48,10 @@ def login():
     return None
 
 
-# def reset_password():
-#     username = 'Cristiano.R'
-#     user_id = '7447677'
-#     info_person = get_info(my_db, user_id)
-#     login_table = my_db.search('login')
-#     login_row = login_table.get_row['']
-#
-#     if info_person and info_person['username'] == username and info_person['ID'] == user_id:
-#         while True:
-#             yes_no = input('You want to reset the password? (y/n): ')
-#             if yes_no.lower() in ['y', 'yes']:
-#                 select = input('Enter your new password (4 digits): ')
-#                 confirm = input('Confirm password: ')
-#                 if select == confirm:
-#                     for entry in login_table.table:
-#                         if entry['ID'] == user_id and entry['username'] == username:
-#                             entry['password'] = confirm
-#                     break
-#                 else:
-#                     print('Your password is not the same. Please enter password again.')
-#
-#             elif yes_no.lower() in ['n', 'no']:
-#                 break
-#
-#             else:
-#                 print('Your answer is none of the above')
-#
-#     else:
-#         print(f'Username {username} with ID {user_id} cannot be found.')
-#
-
-
-
-
+def get_user_data(user_id):
+    for person_info in person_join_login:
+        if person_info['ID'] == user_id:
+            return person_info
 
 # define a function called exit
 
@@ -99,28 +70,65 @@ def exit():
 # make calls to the initializing and login functions defined above
 my_db = DB()
 initializing()
-# val = login()
-
-
-
-
-
 
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
+table_login = my_db.search('login')
+table_person = my_db.search('person')
+person_join_login = table_person.join(table_login, 'ID').table
+print(person_join_login)
+while True:
+    val = login()
+    if val[1] == 'admin':
+        person_info = get_user_data(val[0])
+        admin = Admin(person_info, my_db)
+        print(admin.__str__())
+        continue_to_choice = input('Press enter to continue or type exit to log out: ')
+        if continue_to_choice.lower() == 'exit':
+            print('Successfully log out.')
+            continue
+        while True:
+            print('What do you want to do?')
+            print('1. view or modify all user\n'
+                  '2. view or modify student user\n'
+                  '3. view or modify faculty user\n'
+                  '4. view or modify all project\n'
+                  '5. view or modify member pending request\n'
+                  '6. view or modify advisor pending request\n'
+                  '7. reset password for user\n'
+                  '8. Invite Faculty for project evaporated')
+            choice = int(input('Please select choice: '))
+            if choice == 1:
+                admin.view_user()
+                continue
+            elif choice == 2:
+                admin.view_all_student()
+                modify = input('Press enter 1 to modify or 0 to exit: ')
+                if modify == '0':
+                    continue
+                while True:
+                    print()
+            elif choice == 3:
+                admin.view_all_faculty()
 
-# if val[1] = 'admin':
-    # see and do admin related activities
-# elif val[1] = 'student':
-    # see and do student related activities
-# elif val[1] = 'member':
-    # see and do member related activities
-# elif val[1] = 'lead':
-    # see and do lead related activities
-# elif val[1] = 'faculty':
-    # see and do faculty related activities
-# elif val[1] = 'advisor':
-    # see and do advisor related activities
+    elif val[1] == 'student':
+        person_info = get_user_data(val[0])
+        student = Student(person_info, my_db)
+        print(student.__str__())
+        continue_to_choice = input('Press enter to continue or type exit to log out: ')
+        if continue_to_choice.lower() == 'exit':
+            print('Successfully log out.')
+            continue
+
+
+    elif val[1] == 'member':
+        pass
+    elif val[1] == 'lead':
+        pass
+    elif val[1] == 'faculty':
+        pass
+    elif val[1] == 'advisor':
+        pass
 
 
 # once everything is done, make a call to the exit function

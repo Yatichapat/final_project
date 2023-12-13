@@ -16,7 +16,7 @@ class Admin:
 
     def __str__(self):
         return (f'Hello {self.__user}. You activate as a {self.__role}\n'
-                f'This is the user information\n'
+                f'This is your user information\n'
                 f'First name: {self.__first}\n'
                 f'Last name: {self.__last}\n'
                 f'ID: {self.__id}')
@@ -42,7 +42,13 @@ class Admin:
     def view_member_pend(self):
         member_pend = self.__db.search('member_pending')
         for member in member_pend.table:
-            print(f"ProjectID: {member['ProjectID']}  ")
+            print(f"ProjectID: {member['ProjectID']} From: {member['to_be_member']}")
+            # ProjectID, to_be_member, Response, Response date, Resend counter
+
+    def view_user(self):
+        person = self.__db.search('person')
+        for person in person.table:
+            print(f"ID: {person['ID']} Firstname: {person['first']} Lastname: {person['last']} Role: {person['type']}")
 
     def create_table(self, table_name):
         self.__db.insert(Table(table_name, []))
