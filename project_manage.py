@@ -2,7 +2,6 @@
 from database import DB, Table, read_csv, write_csv, get_info
 from role.Admin import Admin
 
-
 # define a function called initializing
 
 
@@ -29,7 +28,12 @@ def initializing():
     my_db.insert(table_advisor_pend)
     my_db.insert(table_member_pend)
     my_db.insert(table_project)
-    print(table_login)
+
+    person_join_login = table_person.join(table_login, 'ID')
+
+    for person_info in person_join_login.table:
+        admin = Admin(person_info, my_db)
+        admin.view_all_project()
 
 
 def login():
@@ -43,36 +47,36 @@ def login():
     return None
 
 
-def reset_password():
-    username = 'Cristiano.R'
-    user_id = '7447677'
-    info_person = get_info(my_db, user_id)
-    login_table = my_db.search('login')
-    login_row = login_table.get_row['']
-
-    if info_person and info_person['username'] == username and info_person['ID'] == user_id:
-        while True:
-            yes_no = input('You want to reset the password? (y/n): ')
-            if yes_no.lower() in ['y', 'yes']:
-                select = input('Enter your new password (4 digits): ')
-                confirm = input('Confirm password: ')
-                if select == confirm:
-                    for entry in login_table.table:
-                        if entry['ID'] == user_id and entry['username'] == username:
-                            entry['password'] = confirm
-                    break
-                else:
-                    print('Your password is not the same. Please enter password again.')
-
-            elif yes_no.lower() in ['n', 'no']:
-                break
-
-            else:
-                print('Your answer is none of the above')
-
-    else:
-        print(f'Username {username} with ID {user_id} cannot be found.')
-
+# def reset_password():
+#     username = 'Cristiano.R'
+#     user_id = '7447677'
+#     info_person = get_info(my_db, user_id)
+#     login_table = my_db.search('login')
+#     login_row = login_table.get_row['']
+#
+#     if info_person and info_person['username'] == username and info_person['ID'] == user_id:
+#         while True:
+#             yes_no = input('You want to reset the password? (y/n): ')
+#             if yes_no.lower() in ['y', 'yes']:
+#                 select = input('Enter your new password (4 digits): ')
+#                 confirm = input('Confirm password: ')
+#                 if select == confirm:
+#                     for entry in login_table.table:
+#                         if entry['ID'] == user_id and entry['username'] == username:
+#                             entry['password'] = confirm
+#                     break
+#                 else:
+#                     print('Your password is not the same. Please enter password again.')
+#
+#             elif yes_no.lower() in ['n', 'no']:
+#                 break
+#
+#             else:
+#                 print('Your answer is none of the above')
+#
+#     else:
+#         print(f'Username {username} with ID {user_id} cannot be found.')
+#
 
 
 
@@ -96,7 +100,8 @@ def exit():
 my_db = DB()
 initializing()
 # val = login()
-reset_password()
+
+
 
 
 

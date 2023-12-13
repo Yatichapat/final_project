@@ -31,8 +31,6 @@ def get_info(db, id_person):
     login_data = db.search('login')
     temp = person_info.join(login_data, 'ID')
 
-    print(temp)
-
     for i in temp.table:
         if i['ID'] == id_person:
             return {'ID': i['ID'], 'username': i['username'], 'first': i['first'], 'last': i['last'], 'role': i['role']}
@@ -133,6 +131,11 @@ class Table:
         if row in self.table:
             if key in self.table[row]:
                 self.table[row][key] = val
+
+    def remove_row(self, key, val):
+        for row in list(self.table.keys()):
+            if key in self.table[row] and self.table[row][key] == val:
+                del self.table[row]
 
     def __str__(self):
         return self.table_name + ':' + str(self.table)

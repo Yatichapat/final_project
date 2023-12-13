@@ -1,5 +1,5 @@
 from database import DB, Table, gen_project_id
-from datetime import date
+from datetime import date, datetime
 database = DB()
 
 
@@ -19,9 +19,74 @@ class Student:
                 f'Last name: {self.__last}\n'
                 f'ID: {self.__id}')
 
-    def see_request_member(self):
-        print(self.__db.search('member_pending').table)
 
+class Lead(Student):
+    def create_project(self, title):
+        new_proj = {
+            'ProjectID': gen_project_id(),
+            'Title': title,
+            'Lead': f'{self.__id}{self.__first}',
+            'Member1': '-',
+            'Member2': '-',
+            'Advisor': '-',
+            'Status': 'Processing'
+        }
+        self.__db.search('project').insert(new_proj)
+
+        login = self.__db.search('login')
+        login_row = login.get_row(lambda x: x['ID'] == self.__id)
+        login.update(login_row, 'role', 'lead')
+
+    def send_request_member(self, project_id, student_name, student_id):
+        login = self.__db.search('login')
+        member_pending = self.__db.search('member_pending')
+        login_row = login.get_row(lambda x: x['ID'] == student_id and x['first'] == student_name and x['role'] == 'student')
+
+        if login_row:
+            new_request = {
+                'ProjectID': project_id,
+                'to_be_member': f'{self.__id}{self.__first}',
+                'Response': '-',
+                'Response date': date.today()
+            }
+            member_pending.insert(new_request)
+
+    def check_request_member(self, project_id):
+        member_pending = self.__db.search('member_pending')
+        current_date = datetime.now().date()
+
+        pending_request = member_pending.get_row(lambda x: x['Response'] == '-' and x['Response date'] <= current_date)
+
+        for request in pending_request:
+            request_date = request['Response date']
+            days_since_request = (current_date - request_date).day
+            if days_since_request >= 3:
+                self.auto_reject_request(project_id)
+
+        if pending_request:
+            print('Pending Membership Requests:')
+            for request in pending_request:
+                print(f"ProjectID: {request['ProjectID']}, To Be Member: {request['to_be_member']}")
+        else:
+            print('No pending membership request found.')
+
+    def auto_resend_request(self, request):
+        member_pending = self.__db.search('member_pending')
+
+        request['Response date'] = datetime.now().date()
+        request['Resend counter'] = request.get('Resend counter', 0) + 1
+
+        self.__db.update(member_pending, 'Resend counter', request)
+
+    def auto_reject_request(self, project_id):
+        member_pending = self.__db.search('member_pending')
+
+        member_pending_row = member_pending.get_row(lambda x: x['ProjectID'] == project_id and x['ID'] == self.__id)
+        member_pending.update(member_pending_row, 'Response_date', date.today())
+        member_pending_row.update(member_pending_row, 'Response', 'Deny')
+
+
+class Member(Student):
     def respond_member_request(self, project_id, respond):
         member_pending = self.__db.search('member_pending')
         project = self.__db.search('project')
@@ -50,18 +115,3 @@ class Student:
                 print('Your option is none in above. Please enter your choice again.')
                 continue
 
-    def create_project(self, title):
-        new_proj = {
-            'ProjectID': gen_project_id(),
-            'Title': title,
-            'Lead': f'{self.__id}{self.__first}',
-            'Member1': '-',
-            'Member2': '-',
-            'Advisor': '-',
-            'Status': 'Processing'
-        }
-        self.__db.search('project').insert(new_proj)
-
-        login = self.__db.search('login')
-        login_row = login.get_row(lambda x: x['ID'] == self.__id)
-        login.update(login_row, 'role', 'lead')

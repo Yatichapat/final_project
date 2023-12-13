@@ -21,8 +21,28 @@ class Admin:
                 f'Last name: {self.__last}\n'
                 f'ID: {self.__id}')
 
-    def view_database(self):
-        return self.__db
+    def view_all_student(self):
+        if self.__role == 'student':
+            print(f"ID: {self.__id} Firstname: {self.__first} Lastname: {self.__last} Role: {self.__role}")
+
+    def view_all_faculty(self):
+        if self.__role == 'faculty':
+            print(f"ID: {self.__id} Firstname: {self.__first} Lastname: {self.__last} Role: {self.__role}")
+
+    def view_all_project(self):
+        i = 0
+        projects = self.__db.search('project')
+        while i <= len(projects.table):
+            project = projects.table[i]
+            print(f"ProjectID: {project['ProjectID']} Title: {project['Title']} LeaderID: {project['Lead']} "
+                  f"Member1: {project['Member1']} Member2: {project['Member2']} Advisor: {project['Advisor']} "
+                  f"Status: {project['Status']}")
+            i += 1
+
+    def view_member_pend(self):
+        member_pend = self.__db.search('member_pending')
+        for member in member_pend.table:
+            print(f"ProjectID: {member['ProjectID']}  ")
 
     def create_table(self, table_name):
         self.__db.insert(Table(table_name, []))
@@ -36,10 +56,6 @@ class Admin:
     def update(self, table_name, row, key, val):
         self.__db.search(table_name).update(row, key, val)
 
-    def update_password(self, new_password):
-        if new_password != self.password:
-            self.password = new_password
-
     def insert_table(self, table_name):
         self.__db.insert(table_name)
 
@@ -51,10 +67,12 @@ class Admin:
     def __validated_password(self, password):
         return password == self.__password
 
-    @property
-    def password(self):
-        return self.__password
+    def reset_password(self, user):
+        password = ''
+        for new_digit in range(4):
+            password += str(random.randint(1, 9))
+        for row in self.__db.search('login').table:
+            if row['username'] == user:
+                row['password'] = password
 
-    @password.setter
-    def password(self, new_password):
-        self.__password = new_password
+
