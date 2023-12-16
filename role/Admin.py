@@ -21,13 +21,10 @@ class Admin:
                 f'Last name: {self.__last}\n'
                 f'ID: {self.__id}')
 
-    def view_all_student(self):
-        if self.__role == 'student':
-            print(f"ID: {self.__id} Firstname: {self.__first} Lastname: {self.__last} Role: {self.__role}")
-
-    def view_all_faculty(self):
-        if self.__role == 'faculty':
-            print(f"ID: {self.__id} Firstname: {self.__first} Lastname: {self.__last} Role: {self.__role}")
+    def view_advisor_pend(self):
+        advisor_pend = self.__db.search('advisor_pending')
+        for advisor in advisor_pend.table:
+            print(f"ProjectID: {advisor['ProjectID']} From: {advisor['to_be_advisor']}")
 
     def view_all_project(self):
         i = 0
@@ -40,10 +37,7 @@ class Admin:
             i += 1
 
     def view_member_pend(self):
-        member_pend = self.__db.search('member_pending')
-        for member in member_pend.table:
-            print(f"ProjectID: {member['ProjectID']} From: {member['to_be_member']}")
-            # ProjectID, to_be_member, Response, Response date, Resend counter
+        return self.__db.search('member_pending').table
 
     def view_user(self):
         person = self.__db.search('person')
@@ -68,11 +62,45 @@ class Admin:
     def insert_row(self, table_name, row_name):
         self.__db.search(table_name).insert(row_name)
 
-#  If users forget their password
+    def send_request_committee(self, project_id, advisor_name, advisor_id):
+        login = self.__db.search('login')
+        faculty = self.__db.search('faculty')
+        advisor_pending = self.__db.search('member_pending')
 
-    def __validated_password(self, password):
-        return password == self.__password
+        faculty_row = faculty.get_row(lambda x: x['ID'] == advisor_id and x['first'] == advisor_name)
+        login_row = login.get_row(
+            lambda x: x['ID'] == advisor_id and x['first'] == advisor_name and x['role'] == 'faculty')
 
+        if login_row:
+            new_request = {
+                'ProjectID': project_id,
+                'to_be_advisor': f'{self.__id}{self.__first}',
+                'Response': '-',
+                'Response date': date.today()
+            }
+            advisor_pending.insert(new_request)
+            faculty.update(faculty_row, 'num_request', +1)
+
+    def modify_user_data(self, user_id, respond, new):
+        person = self.__db.search('person')
+        login = self.__db.search('login')
+        person_login = person.join(login, 'ID').table
+
+        person_login.get_row(lambda x: x['ID'] == user_id)
+
+        for new_data in person_login:
+            if respond == 1:
+                new_data['username'] = new
+            elif respond == 2:
+                new_data['first'] = new
+            elif respond == 3:
+                new_data['last'] = new
+
+
+
+
+
+    #  If users forget their password
     def reset_password(self, user):
         password = ''
         for new_digit in range(4):
@@ -80,5 +108,8 @@ class Admin:
         for row in self.__db.search('login').table:
             if row['username'] == user:
                 row['password'] = password
+        print(f"This is your new password: {password}")
+
+
 
 

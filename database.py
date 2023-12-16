@@ -138,7 +138,6 @@ class Table:
                 del self.table[row]
 
 
-
     def __str__(self):
         return self.table_name + ':' + str(self.table)
 
