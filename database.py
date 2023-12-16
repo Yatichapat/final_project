@@ -127,15 +127,16 @@ class Table:
                 head = i
             return head[0]
 
-    def update(self, row, key, val):
-        if row in self.table:
-            if key in self.table[row]:
-                self.table[row][key] = val
-
     def remove_row(self, key, val):
         for row in list(self.table.keys()):
             if key in self.table[row] and self.table[row][key] == val:
                 del self.table[row]
+
+    def update(self, key, val, data):
+        for item in self.table:
+            if item[key] == val:
+                for data_key, data_val in data.items():
+                    item[data_key] = data_val
 
 
     def __str__(self):
@@ -147,9 +148,8 @@ class Table:
 # modify the code in the Table class so that it supports the update operation where an entry's value associated with a key can be updated
 
 # my_DB = DB()
-# person = my_DB.read_csv('persons.csv')
+# person = read_csv('persons.csv')
 # table1 = Table('persons', person)
 # my_DB.insert(table1)
 # my_table1 = my_DB.search('persons')
-# print(my_table1)
-# print(my_DB)
+# write_csv('person_test.csv', person, my_DB)

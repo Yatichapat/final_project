@@ -37,7 +37,7 @@ class Admin:
             i += 1
 
     def view_member_pend(self):
-        return self.__db.search('member_pending').table
+        return self.__db.search('member_pending').table_info
 
     def view_user(self):
         person = self.__db.search('person')
@@ -84,11 +84,11 @@ class Admin:
     def modify_user_data(self, user_id, respond, new):
         person = self.__db.search('person')
         login = self.__db.search('login')
-        person_login = person.join(login, 'ID').table
+        person_login = person.join(login, 'ID').table_info
 
         person_login.get_row(lambda x: x['ID'] == user_id)
 
-        for new_data in person_login:
+        for new_data in person_login.table:
             if respond == 1:
                 new_data['username'] = new
             elif respond == 2:
@@ -105,7 +105,7 @@ class Admin:
         password = ''
         for new_digit in range(4):
             password += str(random.randint(1, 9))
-        for row in self.__db.search('login').table:
+        for row in self.__db.search('login').table_info:
             if row['username'] == user:
                 row['password'] = password
         print(f"This is your new password: {password}")

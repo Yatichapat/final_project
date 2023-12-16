@@ -21,7 +21,7 @@ class Faculty:
                 f'ID: {self.__id}')
 
     def view_request_advisor(self):
-        return self.__db.search('Advisor_pending_request.csv').table
+        return self.__db.search('Advisor_pending_request.csv').table_info
 
     def respond_advisor_request(self, project_id, respond):
         advisor_pending = self.__db.search('advisor_pending')
@@ -47,17 +47,15 @@ class Faculty:
                 continue
 
     def respond_committee_request(self, project_id, respond):
-        login = self.__db.search('login')
         project = self.__db.search('project')
 
-        login_row = login.get_row(lambda x: x['Project'])
-        project_row = project.get_row()
+        project_row = project.get_row(lambda x: x['ProjectID'] == project_id)
         while True:
             if respond.lower() == 'a':
-                if project.table[project_row]['Committee1'] == '-':
+                if project.table_info[project_row]['Committee1'] == '-':
                     project.update(project_row, 'Committee1', f'{self.__id}{self.__first}')
                     break
-                elif project.table[project_row]['Committee2'] == '-':
+                elif project.table_info[project_row]['Committee2'] == '-':
                     project.update(project_row, 'Committee2', f'{self.__id}{self.__first}')
                 else:
                     project.update(project_row, 'Committee3', f'{self.__id}{self.__first}')
@@ -82,6 +80,16 @@ class Advisor(Faculty):
         else:
             print("Your answer is unavailable")
 
+class Committee(Faculty):
+    def evaluated_project(self, project_id, approve):
+        project = self.__db.search('project')
+        eva_project = project.get_row(lambda x: x['Status'] == 'Submit')
+        project_row = project.get_row(lambda x: x['ProjectID'] == project_id)
+
+        if approve == 'y':
+            project.update(project_row, 'Committee1', 'Approved')
+
+            project.update(project_row, 'count_approved', +1)
 
 
 

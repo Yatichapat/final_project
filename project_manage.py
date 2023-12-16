@@ -1,5 +1,5 @@
 # import database module
-from database import DB, Table, read_csv, write_csv, get_info
+from database import DB, Table, read_csv, get_info
 from role.Student import Student, Lead, Member
 from role.Faculty import Faculty, Advisor
 from role.Admin import Admin
@@ -56,8 +56,8 @@ def login():
 
 # define a function called exit
 
-def exit():
-    write_csv('project.csv', 'projects', my_db)
+# def exit():
+#     write_csv('project.csv', 'projects', my_db)
 
 
 
@@ -74,11 +74,13 @@ initializing()
 
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
-table_login = my_db.search('login')
-table_person = my_db.search('person')
-person_join_login = table_person.join(table_login, 'ID')
-print(person_join_login)
+
+
 while True:
+    table_login = my_db.search('login')
+    table_person = my_db.search('person')
+    person_join_login = table_person.join(table_login, 'ID')
+    print(person_join_login)
     val = login()
     person_info = get_info(my_db, val[0])
     if val[1] == 'admin':
@@ -93,8 +95,10 @@ while True:
             print('0. Log out\n'
                   '1. modify all user\n'
                   '2. view request\n'
-                  '3. Invite Faculty to be Supervisor\n')
+                  '3. Invite Faculty to be Committee\n')
             choice = int(input('Please select number: '))
+            if choice == 0:
+                break
             if choice == 1:
                 admin.view_user()
                 continue
@@ -122,15 +126,13 @@ while True:
             if choice == 1 and val[1] != ['member']:
                 title = input('Enter Title: ')
                 student.create_project(title)
-                print('Please Log in again to continue as a lead')
-                break
+                print('Please Log in again to continue as lead')
 
-            elif choice == 2:
-                # print(f"You have {} notification")
-                student.view_student_list()
-                project_id = str(input('Enter Project ID: '))
-                print()
-                respond = str(input("Do you want to accept or denied?(a/d): "))
+                break
+            elif choice == 2 and val[1] != ['lead']:
+                # view project detail
+                project_id = str(input('Type Project ID that you want: '))
+                respond = input('Do you want to accept offer?')
                 student.respond_member_request(project_id, respond)
 
     elif val[1] == 'member':
@@ -175,7 +177,12 @@ while True:
             if choice == 1:
                 member_id = input('Enter member ID: ')
                 member_name = input('Enter member name: ')
-                lead.send_request_member(person_info['ID'], member_id, member_name)
+                lead.send_request_member(member_id, member_name)
+                lead.auto_reject_request()
+                continue
+
+            elif choice == 2:
+                lead.check_request_member()
 
     elif val[1] == 'faculty':
         faculty = Faculty(person_info, my_db)
@@ -184,6 +191,16 @@ while True:
         if continue_to_choice.lower() == 'exit':
             print('Successfully log out.')
             continue
+        print('What do you want to do?')
+        print('0. Log out\n'
+              '1. Check notification\n'
+              '2. Evaluating projects\n')
+        choice = int(input('Please select number: '))
+        # if choice == 1:
+            # num_request =
+
+
+
 
     elif val[1] == 'advisor':
         advisor = Advisor(person_info, my_db)

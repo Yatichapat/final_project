@@ -23,21 +23,28 @@ class Student:
         if self.__role == 'student':
             print(f"ID: {self.__id} Firstname: {self.__first} Lastname: {self.__last} Role: {self.__role}")
 
+    def view_request(self):
+        project = self.__db.search('project')
+        member_pending = self.__db.search('member_pending')
+        login = self.__db.search('login')
+
+        member_pending_row = filter(lambda x: x[''] == self.__id)
+
     def respond_member_request(self, project_id, respond):
         member_pending = self.__db.search('member_pending')
         project = self.__db.search('project')
         login = self.__db.search('login')
 
-        member_pending_row = member_pending.get_row(lambda x: x['ProjectID'] == project_id and x['ID'] == self.__id)
-        project_row = project.get_row(lambda x: x['ProjectID'] == project_id)
-        login_row = login.get_row(lambda x: x['ID'] == self.__id)
+        member_pending_row = member_pending.filter(lambda x: x['ProjectID'] == project_id and x['ID'] == self.__id)
+        project_row = project.filter(lambda x: x['ProjectID'] == project_id)
+        login_row = login.filter(lambda x: x['ID'] == self.__id)
         member_pending.update(member_pending_row, 'Response_date', date.today())
         while True:
             if respond.lower() == 'a':
                 member_pending.update(member_pending_row, 'Response', 'Accept')
                 login.update(login_row, 'role', 'member')
 
-                if project.table[project_row]['Member1'] == '-':
+                if project.table_info[project_row]['Member1'] == '-':
                     project.update(project_row, 'Member1', f'{self.__id}{self.__first}')
                     break
                 else:
@@ -52,57 +59,79 @@ class Student:
                 continue
 
     def create_project(self, title):
+        project = self.__db.search('project').table
+        gen_proj = gen_project_id()
         new_proj = {
-            'ProjectID': gen_project_id(),
+            'ProjectID': gen_proj,
             'Title': title,
             'Lead': f'{self.__id}{self.__first}',
             'Member1': '-',
             'Member2': '-',
             'Advisor': '-',
-            'Status': 'Processing'
+            'Status': 'Processing',
+            'Committee1': '-',
+            'Committee2': '-',
+            'Committee3': '-',
+            'count_approve': 0
         }
-        self.__db.search('project').insert(new_proj)
+        project.append(new_proj)
 
         login = self.__db.search('login')
-        login_row = login.get_row(lambda x: x['ID'] == self.__id)
-        login.update(login_row, 'role', 'lead')
+        login_row = login.filter(lambda x: x['ID'] == self.__id)
+        for item in login_row.table:
+            if item['role'] == 'student':
+                item['role'] = 'lead'
+                print('Successfully access the lead. This is your Project default setting.')
+            else:
+                print(f"Error: User with ID {self.__id} not found in the login table.")
+        for item in project:
+            print(f"ProjectID: {item['ProjectID']}, Title: {item['Title']}, Lead: {item['Lead']}, "
+                  f"Member1: {item['Member1']}, Member2: {item['Member2']}, Advisor: {item['Advisor']}")
 
 
 class Lead(Student):
+    def __init__(self, data_dict, db):
+        super().__init__(data_dict,db)
 
-    def send_request_member(self, project_id, student_name, student_id):
-        login = self.__db.search('login')
+    def send_request_member(self, student_id, student_name):
+        project = self.__db.search('project').table
+        project_row = project.filter(lambda x: x['Lead'] == f'{self.__id}{self.__first}')
+
+        for item in project_row:
+            if item['Lead'] == f'{self.__id}{self.__first}':
+                project_id = item['ProjectID']
+
         member_pending = self.__db.search('member_pending')
-        login_row = login.get_row(lambda x: x['ID'] == student_id and x['first'] == student_name and x['role'] == 'student')
-
-        if login_row:
-            new_request = {
-                'ProjectID': project_id,
-                'to_be_member': f'{self.__id}{self.__first}',
-                'Response': '-',
-                'Response date': date.today()
-            }
-            member_pending.insert(new_request)
+        new_mem = {
+            'ProjectID': project_id,
+            'to_be_member': f'{self.__id}{self.__first}',
+            'Response': '-',
+            'Response_date': '-',
+            'to_member': f'{student_id}{student_name}'
+        }
+        member_pending.append(new_mem)
 
     def auto_reject_request(self):
         member_pending = self.__db.search('member_pending')
 
         member_pending_row = member_pending.get_row(lambda x: x['ID'] == self.__id)
         current_date = datetime.now()
-        for date_respond in member_pending.table:
+        for date_respond in member_pending.table_info:
             if date_respond['Respond_date'] + timedelta(days=3) <= current_date:
                 member_pending_row.update(member_pending_row, 'Response', 'Deny')
 
-    def check_request_member(self, project_id):
+    def check_request_member(self):
         member_pending = self.__db.search('member_pending')
         current_date = datetime.now().date()
 
-        pending_request = member_pending.get_row(lambda x: x['Response'] == '-' and x['Response_date'] <= current_date)
+        pending_request = member_pending.filter(lambda x: x['Response'] == '-' and x['Response_date'] <= current_date
+                                                          and x['to_be_member'] == f'{self.__id}{self.__first}')
 
         if pending_request:
             print('Pending Membership Requests:')
             for request in pending_request:
-                print(f"ProjectID: {request['ProjectID']}, To Be Member: {request['to_be_member']}")
+                print(f"ProjectID: {request['ProjectID']}, To Be Member: {request['to_be_member']}, "
+                      f"Response: {request['Response']}")
         else:
             print('No pending membership request found.')
 
