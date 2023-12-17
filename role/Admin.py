@@ -37,7 +37,7 @@ class Admin:
             i += 1
 
     def view_member_pend(self):
-        return self.__db.search('member_pending').table_info
+        return self.__db.search('member_pending').table
 
     def view_user(self):
         person = self.__db.search('person')

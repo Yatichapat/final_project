@@ -20,15 +20,37 @@ class Student:
                 f'ID: {self.__id}')
 
     def view_student_list(self):
-        if self.__role == 'student':
-            print(f"ID: {self.__id} Firstname: {self.__first} Lastname: {self.__last} Role: {self.__role}")
+        person = self.__db.search('person')
+        print("ID---------Firstname---Lastname-------Role")
+        for item in person.table:
+            if item['type'] == 'student':
+                print(f"{item['ID']:<10} {item['first']:<12}{item['last']:<15}")
 
-    def view_request(self):
+    def view_project_detail(self):
         project = self.__db.search('project')
         member_pending = self.__db.search('member_pending')
-        login = self.__db.search('login')
 
-        member_pending_row = filter(lambda x: x[''] == self.__id)
+        project_member = project.join(member_pending, 'ProjectID')
+        project_member_filter = project_member.filter(lambda x: x['to_member'] == f'{self.__id}{self.__first}')
+        for item in project_member_filter.table:
+            print('This is project detail:')
+            print(f"ProjectID: {item['ProjectID']}, Title: {item['Title']}, Lead: {item['Lead']}, "
+                  f"Member1: {item['Member1']}, Member2: {item['Member2']}, Advisor: {item['Advisor']}")
+
+    def check_request(self):
+        # project = self.__db.search('project')
+        member_pending = self.__db.search('member_pending').table
+        # login = self.__db.search('login')
+
+        member_pending_row = member_pending.filter(lambda x: x['to_member'] == f'{self.__id}{self.__first}')
+
+        if member_pending_row:
+            print('You have membership request:')
+            for item in member_pending_row:
+                print(f"ProjectID: {item['ProjectID']}, to_be_member: {item['to_be_member']}")
+
+            else:
+                print("There's no membership request yet.")
 
     def respond_member_request(self, project_id, respond):
         member_pending = self.__db.search('member_pending')
@@ -91,13 +113,14 @@ class Student:
 
 class Lead(Student):
     def __init__(self, data_dict, db):
-        super().__init__(data_dict,db)
+        super().__init__(data_dict, db)
+        self.__db = db
 
     def send_request_member(self, student_id, student_name):
-        project = self.__db.search('project').table
+        project = self.__db.search('project')
         project_row = project.filter(lambda x: x['Lead'] == f'{self.__id}{self.__first}')
 
-        for item in project_row:
+        for item in project_row.table:
             if item['Lead'] == f'{self.__id}{self.__first}':
                 project_id = item['ProjectID']
 
@@ -176,3 +199,4 @@ class Member(Student):
                 print(f"ProjectID: {request['ProjectID']}, To Be Member: {request['to_be_member']}")
         else:
             print('No pending advisor request found.')
+

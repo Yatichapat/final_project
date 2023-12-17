@@ -45,14 +45,22 @@ def initializing():
 
 
 def login():
-    username = input('Enter username: ')
-    password = input('Enter password: ')
-    my_login = my_db.search('login')
+    for item in range(3):
+        username = input('Enter username: ')
+        password = input('Enter password: ')
 
-    for entry in my_login.table:
-        if entry['username'] == username and entry['password'] == password:
-            return [entry['ID'], entry['role']]
+        login_user = my_db.search('login').table
+        for entry in login_user:
+            if entry['username'] == username and entry['password'] == password:
+                return [entry['ID'], entry['role']]
+    print('Your username or password has already incorrect more than three times.')
     return None
+
+
+
+
+
+
 
 # define a function called exit
 
@@ -71,7 +79,6 @@ def login():
 # make calls to the initializing and login functions defined above
 my_db = DB()
 initializing()
-
 
 # based on the return value for login, activate the code that performs activities according to the role defined for that person_id
 
@@ -123,17 +130,23 @@ while True:
                   '1. Create Project\n'
                   '2. View notification\n')
             choice = int(input('Please select number: '))
-            if choice == 1 and val[1] != ['member']:
+            if choice == 0:
+                print('Successfully log out.')
+                break
+            elif choice == 1 and val[1] != ['member']:
                 title = input('Enter Title: ')
                 student.create_project(title)
-                print('Please Log in again to continue as lead')
-
+                print('Please Log in again to continue as lead.')
                 break
-            elif choice == 2 and val[1] != ['lead']:
-                # view project detail
-                project_id = str(input('Type Project ID that you want: '))
-                respond = input('Do you want to accept offer?')
-                student.respond_member_request(project_id, respond)
+
+            elif choice == 2:
+                student.view_project_detail()
+                if student.view_project_detail():
+                    project_id = str(input('Type Project ID that you want: '))
+                    respond = input('Do you want to accept offer?')
+                    student.respond_member_request(project_id, respond)
+                else:
+                    print("Don't have any notification yet")
 
     elif val[1] == 'member':
         member = Member(person_info, my_db)
@@ -150,7 +163,9 @@ while True:
                   '3. Check Advisor pending request\n'
                   '4. Check Project detail\n')
             choice = int(input('Please select number: '))
-            if choice == 1:
+            if choice == 0:
+                break
+            elif choice == 1:
                 pass
             elif choice == 2:
                 member.check_request_member()
@@ -175,6 +190,7 @@ while True:
                   '4. Check Advisor pending request\n')
             choice = int(input('Please select number: '))
             if choice == 1:
+                lead.view_student_list()
                 member_id = input('Enter member ID: ')
                 member_name = input('Enter member name: ')
                 lead.send_request_member(member_id, member_name)
