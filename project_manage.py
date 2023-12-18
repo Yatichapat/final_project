@@ -84,7 +84,6 @@ while True:
     table_person = my_db.search('person')
     table_member = my_db.search('member_pending')
     person_join_login = table_person.join(table_login, 'ID')
-    print(person_join_login)
     val = login()
     print('---------------------------------------')
     person_info = get_info(my_db, val[0])
@@ -132,7 +131,7 @@ while True:
             print('What do you want to do?')
             print('0. Log out\n'
                   '1. Create Project\n'
-                  '2. View notification\n')
+                  '2. Check notification\n')
             choice = int(input('Please select number: '))
 
             if choice == 0:
@@ -182,9 +181,8 @@ while True:
                 pass
             elif choice == 2:
                 member.check_request_member()
-            elif choice == 3:
                 member.check_advisor_request()
-            elif choice == 4:
+            elif choice == 3:
                 member.view_project_detail()
 
     elif val[1] == 'lead':
@@ -203,7 +201,8 @@ while True:
                   '2. Send invitation to Advisor\n'
                   '3. Check pending request\n'
                   '4. View Project detail and Status\n'
-                  '5. Submit the Project to Advisor')
+                  '5. Submit the Project to Advisor\n'
+                  '6. Delete Project')
             choice = int(input('Please select number: '))
             if choice == 0:
                 print('Successfully log out.\n'
@@ -235,9 +234,16 @@ while True:
 
             elif choice == 4:
                 lead.view_project_detail()
+                lead.check_project_status()
 
             elif choice == 5:
                 lead.submit_project()
+
+            elif choice == 6:
+                confirm = input('Do you want to delete project? (y/n): ')
+                if confirm.lower() == 'y' or confirm.lower() == 'yes':
+                    project_id = str(input('Input Project ID you want to delete: '))
+                    lead.delete_project(project_id)
 
     elif val[1] == 'faculty':
         faculty = Faculty(person_info, my_db)
@@ -246,13 +252,23 @@ while True:
         if continue_to_choice.lower() == 'exit':
             print('Successfully log out.')
             continue
+        print('---------------------------------------')
         print('What do you want to do?')
         print('0. Log out\n'
               '1. Check notification\n'
               '2. Evaluating projects\n')
         choice = int(input('Please select number: '))
-        # if choice == 1:
-            # num_request =
+        if choice == 1:
+            faculty.check_request_advisor()
+            faculty.check_request_evaluate()
+            request_to_handle = faculty.check_request_advisor()
+            for project_id, respond in request_to_handle:
+                faculty.respond_advisor_request(project_id, respond)
+        elif choice == 2:
+            faculty.view_project_detail()
+            project_id = str(input('Enter Project ID:'))
+            respond = input("Do you want to approve the project? (y/n): ")
+            faculty.evaluated_project(project_id, respond)
 
     elif val[1] == 'advisor':
         advisor = Advisor(person_info, my_db)
@@ -261,6 +277,25 @@ while True:
         if continue_to_choice.lower() == 'exit':
             print('Successfully log out.')
             continue
+        while True:
+            print('---------------------------------------')
+            print('What do you want to do?')
+            print('0. Log out\n'
+                  '1. Modify Project\n'
+                  '2. Approved Project')
+            choice = int(input('Please select number: '))
+            if choice == 0:
+                print('Successfully log out.\n'
+                      '---------------------------------------')
+                break
+            elif choice == 1:
+                pass
+            elif choice == 2:
+                advisor.view_project_detail()
+                respond = input('Do you want to approve the project? (y/n): ')
+                advisor.approve_project(respond)
+
+
 
 # once everything is done, make a call to the exit function
 # exit()

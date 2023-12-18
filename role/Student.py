@@ -46,6 +46,13 @@ class Student:
             print(f"ProjectID: {item['ProjectID']}\n Title: {item['Title']}\n Lead: {item['Lead']}\n "
                   f"Member1: {item['Member1']}\n Member2: {item['Member2']}\n Advisor: {item['Advisor']}")
 
+    def check_project_status(self):
+        project = self.__db.search('project')
+        for item in project.table:
+            print('---------------------------------------')
+            print('This is project detail:')
+            print(f"ProjectID: {item['ProjectID']}\n Title: {item['Title']}\n Status: {item['Status']}")
+
     def check_request(self):
         project = self.__db.search('project')
         member_pending = self.__db.search('member_pending')
@@ -133,6 +140,10 @@ class Student:
             print(f"ProjectID: {item['ProjectID']}\nTitle: {item['Title']}\nLead: {item['Lead']}\n"
                   f"Member1: {item['Member1']}\nMember2: {item['Member2']}\nAdvisor: {item['Advisor']}")
 
+    def delete_project(self, project_id):
+        project = self.__db.search('project').filter(lambda x: x['ProjectID'] == project_id).table
+
+
 
 class Lead(Student):
     def __init__(self, data_dict, db):
@@ -152,7 +163,7 @@ class Lead(Student):
             if item['Lead'] == f'{self.__id}_{self.__first}':
                 project_id = item['ProjectID']
 
-        student_num_request = self.__db.search('student').filter(lambda x: x['ProjectID'] == project_id)
+        student_num_request = self.__db.search('project').filter(lambda x: x['ProjectID'] == project_id)
         member_pending = self.__db.search('member_pending').table
         new_mem = {
             'ProjectID': project_id,
@@ -221,9 +232,9 @@ class Lead(Student):
         advisor_pending = self.__db.search('advisor_pending')
 
         pending_request = advisor_pending.get_row(lambda x: x['to_be_advisor'] == f'{self.__id}_{self.__first}')
-        if pending_request.table:
+        if pending_request:
             print('Pending Advisor Requests:')
-            for request in pending_request:
+            for request in pending_request.table:
                 print(f"ProjectID: {request['ProjectID']}, To: {request['to_advisor']}")
         else:
             print('No pending advisor request found.')
@@ -235,7 +246,6 @@ class Lead(Student):
                 project.update('Lead', f'{self.__id}_{self.__first}', {'Status': 'Submit'})
             else:
                 print("You can't submit the project without advisor")
-
 
 
 class Member(Student):

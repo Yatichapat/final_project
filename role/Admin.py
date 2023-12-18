@@ -53,33 +53,20 @@ class Admin:
     def delete_row(self, table_name, row_name):
         self.__db.search(table_name).remove(row_name)
 
-    def update(self, table_name, row, key, val):
-        self.__db.search(table_name).update(row, key, val)
-
     def insert_table(self, table_name):
         self.__db.insert(table_name)
 
     def insert_row(self, table_name, row_name):
         self.__db.search(table_name).insert(row_name)
 
-    def send_request_committee(self, project_id, advisor_name, advisor_id):
+    def send_request_committee(self, project_id, faculty_id, faculty_name):
+        project = self.__db.search('project')
+        project_row = project.filter(lambda x: x['ProjectID'] == project_id)
         login = self.__db.search('login')
-        faculty = self.__db.search('faculty')
-        advisor_pending = self.__db.search('member_pending')
 
-        faculty_row = faculty.get_row(lambda x: x['ID'] == advisor_id and x['first'] == advisor_name)
-        login_row = login.get_row(
-            lambda x: x['ID'] == advisor_id and x['first'] == advisor_name and x['role'] == 'faculty')
-
-        if login_row:
-            new_request = {
-                'ProjectID': project_id,
-                'to_be_advisor': f'{self.__id}{self.__first}',
-                'Response': '-',
-                'Response date': date.today()
-            }
-            advisor_pending.insert(new_request)
-            faculty.update(faculty_row, 'num_request', +1)
+        for request in project_row.table:
+            print(f"ProjectID: {request['ProjectID']}, Title: {request['Title']}, "
+                  f"Lead: {request['Lead']}, Member1: {request['Member1']}, Member2: {request['Member2']}")
 
     def modify_user_data(self, user_id, respond, new):
         person = self.__db.search('person')
