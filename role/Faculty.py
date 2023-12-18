@@ -21,7 +21,7 @@ class Faculty:
                 f'ID: {self.__id}')
 
     def view_request_advisor(self):
-        return self.__db.search('Advisor_pending_request.csv').table_info
+        return self.__db.search('Advisor_pending_request.csv').table
 
     def respond_advisor_request(self, project_id, respond):
         advisor_pending = self.__db.search('advisor_pending')

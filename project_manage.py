@@ -53,13 +53,9 @@ def login():
         for entry in login_user:
             if entry['username'] == username and entry['password'] == password:
                 return [entry['ID'], entry['role']]
+
     print('Your username or password has already incorrect more than three times.')
     return None
-
-
-
-
-
 
 
 # define a function called exit
@@ -86,9 +82,11 @@ initializing()
 while True:
     table_login = my_db.search('login')
     table_person = my_db.search('person')
+    table_member = my_db.search('member_pending')
     person_join_login = table_person.join(table_login, 'ID')
     print(person_join_login)
     val = login()
+    print('---------------------------------------')
     person_info = get_info(my_db, val[0])
     if val[1] == 'admin':
         admin = Admin(person_info, my_db)
@@ -96,8 +94,10 @@ while True:
         continue_to_choice = input('Press enter to continue or type exit to log out: ')
         if continue_to_choice.lower() == 'exit':
             print('Successfully log out.')
+            print('---------------------------------------')
             continue
         while True:
+            print('---------------------------------------')
             print('What do you want to do?')
             print('0. Log out\n'
                   '1. modify all user\n'
@@ -105,6 +105,8 @@ while True:
                   '3. Invite Faculty to be Committee\n')
             choice = int(input('Please select number: '))
             if choice == 0:
+                print('Successfully Log out.')
+                print('---------------------------------------')
                 break
             if choice == 1:
                 admin.view_user()
@@ -122,48 +124,59 @@ while True:
         print(student.__str__())
         continue_to_choice = input('Press enter to continue or type exit to log out: ')
         if continue_to_choice.lower() == 'exit':
-            print('Successfully log out.')
+            print('Successfully Log out.')
+            print('---------------------------------------')
             continue
         while True:
+            print('---------------------------------------')
             print('What do you want to do?')
             print('0. Log out\n'
                   '1. Create Project\n'
                   '2. View notification\n')
             choice = int(input('Please select number: '))
+
             if choice == 0:
-                print('Successfully log out.')
+                print('Successfully log out.\n'
+                      '---------------------------------------')
                 break
             elif choice == 1 and val[1] != ['member']:
                 title = input('Enter Title: ')
                 student.create_project(title)
+                print('---------------------------------------')
                 print('Please Log in again to continue as lead.')
                 break
 
-            elif choice == 2:
-                student.view_project_detail()
-                if student.view_project_detail():
-                    project_id = str(input('Type Project ID that you want: '))
-                    respond = input('Do you want to accept offer?')
-                    student.respond_member_request(project_id, respond)
-                else:
-                    print("Don't have any notification yet")
+            elif choice == 2 and val[1] != ['lead']:
+                request_to_handle = student.check_request()
+                if request_to_handle is not None:
+                    for project_id, respond in request_to_handle:
+                        if project_id == 'exit':
+                            continue
+                        else:
+                            student.respond_member_request(project_id, respond)
+                            if respond.lower() != 'n':
+                                print('---------------------------------------')
+                                print('Please Log in again to continue as member.')
+                        break
 
     elif val[1] == 'member':
         member = Member(person_info, my_db)
         print(member.__str__())
         continue_to_choice = input('Press enter to continue or type exit to log out: ')
         if continue_to_choice.lower() == 'exit':
-            print('Successfully log out.')
+            print('Successfully log out.\n'
+                  '---------------------------------------')
             continue
         while True:
             print('What do you want to do?')
             print('0. Log out\n'
                   '1. Modify Project\n'
-                  '2. Check Member pending request\n'
-                  '3. Check Advisor pending request\n'
-                  '4. Check Project detail\n')
+                  '2. Check pending request\n'
+                  '3. Check Project detail\n')
             choice = int(input('Please select number: '))
             if choice == 0:
+                print('Successfully log out.\n'
+                      '---------------------------------------')
                 break
             elif choice == 1:
                 pass
@@ -172,33 +185,59 @@ while True:
             elif choice == 3:
                 member.check_advisor_request()
             elif choice == 4:
-                pass
+                member.view_project_detail()
 
     elif val[1] == 'lead':
         lead = Lead(person_info, my_db)
         print(lead.__str__())
         continue_to_choice = input('Press enter to continue or type exit to log out: ')
         if continue_to_choice.lower() == 'exit':
-            print('Successfully log out.')
-            continue
+            print('Successfully log out.\n'
+                  '---------------------------------------')
+            break
         while True:
+            print('---------------------------------------')
             print('What do you want to do?')
             print('0. Log out\n'
                   '1. Send invitation to Member\n'
-                  '2. Check Member pending request\n'
-                  '3. Send invitation to Advisor\n'
-                  '4. Check Advisor pending request\n')
+                  '2. Send invitation to Advisor\n'
+                  '3. Check pending request\n'
+                  '4. View Project detail and Status\n'
+                  '5. Submit the Project to Advisor')
             choice = int(input('Please select number: '))
-            if choice == 1:
+            if choice == 0:
+                print('Successfully log out.\n'
+                      '---------------------------------------')
+                break
+            elif choice == 1:
                 lead.view_student_list()
-                member_id = input('Enter member ID: ')
-                member_name = input('Enter member name: ')
-                lead.send_request_member(member_id, member_name)
-                lead.auto_reject_request()
-                continue
+                print('Please enter a student who you want to invite as a member.')
+                member_id = input('Enter student ID you want to invite or type exit to return the previous page: ')
+                if member_id == 'exit':
+                    break
+                else:
+                    member_name = input('Enter student first name: ')
+                    lead.send_request_member(member_id, member_name)
+                    # lead.auto_reject_request()  # incase member is pending for too long
+                    continue
 
             elif choice == 2:
+                lead.view_faculty_list()
+                print('---------------------------------------')
+                print('Please enter a student who you want to invite as a member.')
+                faculty_id = str(input('Enter faculty ID: '))
+                faculty_name = input('Enter faculty first name: ')
+                lead.send_request_advisor(faculty_id, faculty_name)
+
+            elif choice == 3:
                 lead.check_request_member()
+                lead.check_advisor_request()
+
+            elif choice == 4:
+                lead.view_project_detail()
+
+            elif choice == 5:
+                lead.submit_project()
 
     elif val[1] == 'faculty':
         faculty = Faculty(person_info, my_db)
@@ -214,9 +253,6 @@ while True:
         choice = int(input('Please select number: '))
         # if choice == 1:
             # num_request =
-
-
-
 
     elif val[1] == 'advisor':
         advisor = Advisor(person_info, my_db)

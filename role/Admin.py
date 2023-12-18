@@ -96,16 +96,12 @@ class Admin:
             elif respond == 3:
                 new_data['last'] = new
 
-
-
-
-
     #  If users forget their password
     def reset_password(self, user):
         password = ''
         for new_digit in range(4):
             password += str(random.randint(1, 9))
-        for row in self.__db.search('login').table_info:
+        for row in self.__db.search('login').table:
             if row['username'] == user:
                 row['password'] = password
         print(f"This is your new password: {password}")
