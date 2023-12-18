@@ -1,6 +1,6 @@
 # Final Project
 
-Brief description of your project.
+Simulate the senior project to track the work
 
 ## Running or Compiling the Python Script
 
