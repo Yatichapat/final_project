@@ -23,30 +23,28 @@ Follow these steps to run or compile your Python script using PyCharm:
 
 # My process
 
-| Role    | Action                                  | Method               | Class            | Complete Percentage |
-|---------|-----------------------------------------|----------------------|------------------|---------------------|
-| Admin   | Reset password                          | update               | Admin            | 40%                 |
-| Admin   | Modify user                             | update and remove    | Admin            | 50%                 |
-| Admin   | Create table                            | insert               | Admin            | 40%                 |
-| Admin   | Request a committee to evaluate project | update               | Admin            | 60%                 |
-| Admin   | Delete table                            | remove               | Admin            | 30%                 |
+| Role  | Action                                  | Method               | Class            | Complete Percentage |
+|-------|-----------------------------------------|----------------------|------------------|---------------------|
+| Admin | Reset password                          | update               | Admin            | 40%                 |
+| Admin | Modify user                             | update and remove    | Admin            | 50%                 |
+| Admin | Create table                            | insert               | Admin            | 40%                 |
+| Admin | Request a committee to evaluate project | update               | Admin            | 60%                 |
+| Admin | Delete table                            | remove               | Admin            | 30%                 |
 | Student | Create Project                          | append               | Student          | 100%                |
 | Student | Check notification                      | join, filter, append | Student          | 100%                |
 | Student | Respond offer                           | update               | Student          | 100%                |
-| Student | Delete Project                          | filter and           |                  | 30%                 |
-| Lead    | Send request member                     | filter and append    | Lead(Student)    | 100%                |
-| Lead    | Send request advisor                    | filter and append    | Lead(Student)    | 100%                |
-| Lead    | Check pending request                   | filter               | Lead(Student)    | 100%                |
-| Lead    | View project detail and status          | filter               | Student          | 100%                |
-| Lead    | Submit project to Advisor               | filter and append    | Lead(Student)    | 50%                 |
-| Member  | Check pending request                   | filter               | Member(Student)  | 80%                 |
-| Member  | View project detail and status          | filter               | Student          | 90%                 |
+| Student | Delete Project                          | filter and remove    | Student          | 30%                 |
+| Lead  | Send request member                     | filter and append    | Lead(Student)    | 100%                |
+| Lead  | Send request advisor                    | filter and append    | Lead(Student)    | 100%                |
+| Lead  | Check pending request                   | filter               | Lead(Student)    | 100%                |
+| Lead  | View project detail and status          | filter               | Student          | 100%                |
+| Lead  | Submit project to Advisor               | filter and append    | Lead(Student)    | 50%                 |
+| Member | Check pending request                   | filter               | Member(Student)  | 80%                 |
+| Member | View project detail and status          | filter               | Student          | 90%                 |
 | Faculty | Check Notification                      | join, filter, append | Faculty          | 100%                |
 | Faculty | Evaluate Project                        | filter, update       | Faculty          | 60%                 |
 | Faculty | Respond offer to be advisor             | filter, update       | Faculty          | 20%                 |
-| Advisor | Approved project                        | filter, update       | Advisor(Faculty) | 80%                 |
-|         |                                         |                      |                  |                     |
-
+| Advisor | Approved project                        | filter, update       | Advisor(Faculty) | 80%                 | 
 
 ## Outstanding Issues
 
@@ -55,12 +53,6 @@ Follow these steps to run or compile your Python script using PyCharm:
 - **Modify Project:** Didn't put the modify features if user wants to edit data in their project.
 - **Delete Project:** Didn't put delete function on lead role. (They had to send request to Admin to confirm delete project.)
 - **Exit function:** Didn't put exit function when the process had finished.
-
-### Outstanding Bugs
-
-- [ ] **Bug 1:** Description of the first outstanding bug.
-- [ ] **Bug 2:** Description of the second outstanding bug.
-- [ ] ...
 
 ## Actions for [Admin]
 
